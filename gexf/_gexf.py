@@ -61,7 +61,7 @@ class Gexf :
 		return gexfXML
 		
 	def write(self,file):
-		file.write(str(etree.tostring(self.getXML(),pretty_print=True,encoding='utf-8')))
+		file.write(etree.tounicode(self.getXML(),pretty_print=True))
 		self.print_stat()
 	
 	def print_stat(self) :
