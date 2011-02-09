@@ -8,7 +8,7 @@
 #     documentation : http://packages.python.org/pygexf
 #
 #     main developper : Paul Girard, médialab Sciences Po
-#
+#     adaptation to python3 : Fabien Pfaender
 #     licence : GPL v3
 #
 
