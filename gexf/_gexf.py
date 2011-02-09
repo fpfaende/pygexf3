@@ -4,12 +4,15 @@
 #     Gexf library in python
 #     see gephi.org and gexf.net
 #
-#     repository : http://github.com/paulgirard/pygexf
+#     repository : http://github.com/fpfaende/pygexf3
 #     documentation : http://packages.python.org/pygexf
 #
 #     main developper : Paul Girard, médialab Sciences Po
+#
 #     licence : GPL v3
 #
+
+
 
 from lxml  import etree
 from datetime import  *
@@ -43,11 +46,11 @@ class Gexf :
 		g = Graph(type,mode,label)
 		self.graphs.append(g)
 		return g
- 	
- 	def getXML(self):
- 		gexfXML = etree.Element("{"+self.xmlns+"}gexf",version=self.version,nsmap={None:self.xmlns,'viz':self.viz,'xsi':self.xsi})
-# 		gexfXML.set("xmlnsxsi",)
- 		gexfXML.set("{xsi}schemaLocation",self.schemaLocation)
+	
+	def getXML(self):
+		gexfXML = etree.Element("{"+self.xmlns+"}gexf",version=self.version,nsmap={None:self.xmlns,'viz':self.viz,'xsi':self.xsi})
+#		gexfXML.set("xmlnsxsi",)
+		gexfXML.set("{xsi}schemaLocation",self.schemaLocation)
 		meta = etree.SubElement(gexfXML, "meta")
 		meta.set("lastmodified",datetime.now().isoformat())
 		etree.SubElement(meta, "creator").text=self.creator		
@@ -56,16 +59,16 @@ class Gexf :
 			gexfXML.append(graph.getXML())
 			
 		return gexfXML
- 		
- 	def write(self,file):
- 		file.write(etree.tostring(self.getXML(),pretty_print=True,encoding='utf-8'))
- 		self.print_stat()
- 	
- 	def print_stat(self) :
- 		for graph in self.graphs :
- 			graph.print_stat()
+		
+	def write(self,file):
+		file.write(str(etree.tostring(self.getXML(),pretty_print=True,encoding='utf-8')))
+		self.print_stat()
+	
+	def print_stat(self) :
+		for graph in self.graphs :
+			graph.print_stat()
 
- 	
+	
  
 class Graph :
 
@@ -107,7 +110,7 @@ class Graph :
 		return self._nodes[id]
 	
 	def nodeExists(self,id) :
-		if id in self._nodes.keys():
+		if id in list(self._nodes.keys()):
 			return 1
 		else :
 			return 0
@@ -132,12 +135,12 @@ class Graph :
 	
 	def addDefaultAttributesToNode(self,node) :
 		# add existing nodesattributes default values
-		for id,values in self._nodesAttributes.iteritems() :
+		for id,values in self._nodesAttributes.items() :
 			node.addAttribute(id,values["default"])
 			
 	def checkNodeAttribute(self,id,value,start,end):
 		# check conformity with type is missing
-		if id in self._nodesAttributes.keys() :
+		if id in list(self._nodesAttributes.keys()) :
 			if self._nodesAttributes[id]["mode"]=="static" and ( not start=="" or not end=="") : 
 				raise Exception("attribute "+str(id)+" is static you can't specify start or end dates. Declare Attribute as dynamic")
 			return 1		
@@ -152,7 +155,7 @@ class Graph :
 			id=len(self._edgesAttributes)
 		else :
 			id=force_id
-		self._edgesAttributes[id]={"title":title, "default":defaultValue, "mode":mode, "type":type } 		# modify Nodes with default
+		self._edgesAttributes[id]={"title":title, "default":defaultValue, "mode":mode, "type":type }		# modify Nodes with default
 		#for edge in self._edges.values():
 		#	edge.addAttribute(id,defaultValue)
 		return id
@@ -160,12 +163,12 @@ class Graph :
 			
 	def addDefaultAttributesToEdge(self,edge) :
 		# add existing nodesattributes default values
-		for id,values in self._edgesAttributes.iteritems() :
+		for id,values in self._edgesAttributes.items() :
 			edge.addAttribute(id,values["default"])
 			
 	def checkEdgeAttribute(self,id,value,start,end):
 		# check conformity with type is missing
-		if id in self._edgesAttributes.keys() :
+		if id in list(self._edgesAttributes.keys()) :
 			if self._edgesAttributes[id]["mode"]=="static" and ( not start=="" or not end=="") : 
 				raise Exception("attribute "+str(id)+" is static you can't specify start or end dates. Declare Attribute as dynamic")
 			return 1		
@@ -183,7 +186,7 @@ class Graph :
 		attributesXMLNodeStatic.set("class","node")
 		attributesXMLNodeStatic.set("mode","static")
 		
-		for id,value in self._nodesAttributes.iteritems() :
+		for id,value in self._nodesAttributes.items() :
 			if value["mode"]=="static" :
 				attxml=attributesXMLNodeStatic
 			else :
@@ -202,7 +205,7 @@ class Graph :
 		attributesXMLEdgeStatic.set("class","edge")
 		attributesXMLEdgeStatic.set("mode","static")
 		
-		for id,value in self._edgesAttributes.iteritems() :
+		for id,value in self._edgesAttributes.items() :
 			if value["mode"]=="static" :
 				attxml=attributesXMLEdgeStatic
 			else :
@@ -215,19 +218,19 @@ class Graph :
 			etree.SubElement(attributeXML, "default").text=value["default"]
 		
 		nodesXML = etree.SubElement(graphXML, "nodes")
-		for node in self._nodes.values() :
+		for node in list(self._nodes.values()) :
 			nodesXML.append(node.getXML())
 			
 		edgesXML = etree.SubElement(graphXML, "edges")
-		for edge in self._edges.values() :
+		for edge in list(self._edges.values()) :
 			edgesXML.append(edge.getXML())
 			
 		return graphXML
 		
 	def print_stat(self):
-		print self.label+" "+self.type+" "+self.mode+" "+self.start+" "+self.end
- 		print "number of nodes : "+str(len(self._nodes))
- 		print "number of edges : "+str(len(self._edges))
+		print(self.label+" "+self.type+" "+self.mode+" "+self.start+" "+self.end)
+		print("number of nodes : "+str(len(self._nodes)))
+		print("number of edges : "+str(len(self._edges)))
 		
 		
 class Node :
@@ -285,10 +288,10 @@ class Node :
 				colorXML.set("b",self.b)
 			
 			return nodeXML
-		except Exception, e:
-			print self.label
-			print self._attributes	
-			print e
+		except Exception as e:
+			print(self.label)
+			print(self._attributes)	
+			print(e)
 			exit()	
 	
 	def setColor(self,r,g,b) :
@@ -363,9 +366,9 @@ class Edge :
 				if not atts["end"]=="" :
 					attributeXML.set("end",atts["end"])
 			return edgeXML
-		except Exception, e:
-			print self._source+" "+self._target	
-			print e
+		except Exception as e:
+			print(self._source+" "+self._target)	
+			print(e)
 			exit()	
 # COLOR on edges isn't supported in GEXF			
 	def setColor(self,r,g,b) :
@@ -382,7 +385,7 @@ class GexfImport :
 	    tree = etree.parse(file_like, parser)
 	    gexf_xml = tree.getroot()
 	    tag = self.ns_clean(gexf_xml.tag).lower()
-	    if tag <> "gexf" :
+	    if tag != "gexf" :
 		    self.msg_unexpected_tag("gexf", tag)
 		    return
 	    self.gexf_obj = None
@@ -404,7 +407,7 @@ class GexfImport :
 	    return token[i+1:]
     
     def msg_unexpected_tag(self, expected, got) :
-	    print "Error : incorrect xml. Expected tag {expected}, not {got}.".format(expected=expected, got=got)
+	    print("Error : incorrect xml. Expected tag {expected}, not {got}.".format(expected=expected, got=got))
 
     def extract_gexf_obj(self, meta_xml) :
         for child in meta_xml :
